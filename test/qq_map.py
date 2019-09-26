@@ -12,12 +12,20 @@ def getLocation(companyName):
         'key':'S4QBZ-YCHKP-UQ4DM-LHLYI-33TJF-32B22',
         'boundary':'region(北京,1)'
     }
-    ret = requests.get(url, params=params)
+
+    headers = {
+        'Referer':'http://hjwblog.com'
+    }
+    ret = requests.get(url, params=params,headers = headers)
     if ret.status_code != 200:
         print("请求错误：",ret.text)
         return None
     jsonret = json.loads(ret.text)
+    if jsonret['status'] == 110:
+        print("鉴权失败：",jsonret['message'])
+        return  None
     resultList = jsonret['data']
+
 
     # 排除查询失败的情况
     entName = resultList[0]['title']
