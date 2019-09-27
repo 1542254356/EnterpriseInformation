@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-
+from db_test import Database
 # https://apis.map.qq.com/ws/district/v1/search?keyword=桐城&key=S4QBZ-YCHKP-UQ4DM-LHLYI-33TJF-32B22
 
 
@@ -34,8 +34,8 @@ def getLocation(companyName):
     # pre = re.compile('>(.*?)<')
     # entName = ''.join(pre.findall(entName))
 
-    if entName != name:
-        print("公司名字不符合：",name,"结果：",entName,"地址：",address);
+    if entName != companyName:
+        print("公司名字不符合：",companyName,"结果：",entName,"地址：",address);
         return None
 
     return address
@@ -53,7 +53,9 @@ if __name__ == '__main__':
          '苏州欧普照明有限公司'
     ]
 
-    for name in companyNames:
-        ret=  getLocation(name)
-        if ret is not None:
-            print(name,":",ret)
+    with Database('info.db') as db:
+        for name in companyNames:
+            ret=  getLocation(name)
+            if ret is not None:
+                print(name,":",ret)
+                db.write(name, ret)
