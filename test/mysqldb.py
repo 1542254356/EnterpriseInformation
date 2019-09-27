@@ -7,6 +7,7 @@ class Database:
         '''使用records库操作MySQL，还是面向对象的方式舒服一点'''
         n = 0
         while n < 3:
+            n += 1
             try:
                 db = records.Database('mysql://enterprise:enterprise123@hjwblog.com/db_enterprise')
                 break
