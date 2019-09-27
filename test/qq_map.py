@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-from db_test import Database
+from mysqldb import Database
 # https://apis.map.qq.com/ws/district/v1/search?keyword=桐城&key=S4QBZ-YCHKP-UQ4DM-LHLYI-33TJF-32B22
 
 
@@ -53,9 +53,11 @@ if __name__ == '__main__':
          '苏州欧普照明有限公司'
     ]
 
-    with Database('info.db') as db:
+    with Database() as db:
+        _id = 0
         for name in companyNames:
             ret=  getLocation(name)
             if ret is not None:
                 print(name,":",ret)
-                db.write(name, ret)
+                db.write(_id, name, ret)
+                _id += 1
