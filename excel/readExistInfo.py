@@ -54,21 +54,23 @@ class Dict2Excel:
 
 if __name__ == '__main__':
     import os
+    from pprint import pprint
     xls = Excel2Dict(os.path.join('..', 'test', 'sh.xls'))
     # xls_out = Dict2Excel('test1')
     corp_addr_map = {}
     corporation_names = []
-    for i in range(5000):
-        d = xls.get_dict_by_row(random.randint(0, xls.row_num))
-        if d['type'] == '个人':
-            # print('跳过个人', d['cname'])
-            continue
-        new_corp_names = d['cname'].split('; ')
-        corp_addr_map[new_corp_names[0]] = d['addr'].split(' ')[-1]
-        corp_names = [n for n in new_corp_names if len(n) > 6]
-        corporation_names.extend(corp_names)
-        # print(d)
-        # xls_out.fill_by_dict(d)
-    print(corp_addr_map)
-    print(corporation_names)
+    for i in range(500):
+        d = xls.get_dict_by_row(random.randint(1, 8000))
+        cnames = d['cname'].split('; ')
+        types = d['type'].split('; ')
+        addrs = d['addr'].split('; ')
+        for i, e in enumerate(types):
+            if e == '个人':
+                print('跳过个人', cnames[i])
+                continue
+            corp_addr = addrs[i].split(' ')[-1]
+            corp_addr_map[cnames[i]] = corp_addr
+            corporation_names.append(corp_addr)
+    pprint(corp_addr_map)
+    pprint(corporation_names)
     
