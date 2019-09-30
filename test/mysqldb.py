@@ -3,23 +3,30 @@ import records
 
 class Database:
     '''数据库读写封装类'''
-    def __init__(self):
+    def __init__(self, host='hjwblog.com',
+                       user='enterprise',
+                       password='enterprise123',
+                       db_name='db_enterprise',
+                       tb_name='t_company_addr'):
         '''使用records库操作MySQL，还是面向对象的方式舒服一点'''
         n = 0
         while n < 3:
             n += 1
             try:
-                db = records.Database('mysql://enterprise:enterprise123@hjwblog.com/db_enterprise')
+                db = records.Database(f'mysql://{user}:{password}@{host}/{db_name}')
                 break
             except ModuleNotFoundError:
                 # 第一次运行可能会报错，需要执行一次即可
                 import pymysql
                 pymysql.install_as_MySQLdb()
+        if n <= 3:
+            self.connected = True
+        self.table_name = tb_name
         self.db = db
         
     def write(self, id, corp_name, addr):
         '''写入数据库'''
-        self.db.query(f'insert into t_company_addr values({id},"{corp_name}", "{addr}")')
+        self.db.query(f'insert into {self.table_name} values({id},"{corp_name}", "{addr}")')
         
     def query_as_dict(self, sql):
         '''将请求的结果按照字典返回'''
