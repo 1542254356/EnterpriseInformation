@@ -57,18 +57,23 @@ def get_corp_addr_map_and_names(xls_path):
     xls = Excel2Dict(xls_path)
     corp_addr_map = {}
     corporation_names = []
-    for i in range(1, xls.row_num):
-        d = xls.get_dict_by_row(i)
+    for k in range(1, xls.row_num):
+        d = xls.get_dict_by_row(k)
         cnames = d['cname'].split('; ')
-        types = d['type'].split('; ')
-        addrs = d['addr'].split('; ')
-        for i, e in enumerate(types):
-            if e == '个人' or len(cnames[i]) < 4:
-                print('跳过个人', cnames[i])
+        types = d['type'].split('  ')
+        # 去掉尾部空项
+        if len(types) > 1:
+            types = types[:-1]
+        addr = d['addr']
+        for i, e in enumerate(cnames):
+            # TODO: 类型长度与公司名长度不匹配导致IndexError
+            # 这里只用名字长度作为个人的区分, 避免使用下标, 可能还需要改进
+            if len(e) < 4:
+                print('跳过', e)
                 continue
-            corp_addr = addrs[i].split(' ')[-1]
-            corp_addr_map[cnames[i]] = corp_addr
-            corporation_names.append(cnames[i])
+            corp_addr = addr.split(' ')[-1]
+            corp_addr_map[e] = corp_addr
+            corporation_names.append(e)
     return corp_addr_map, corporation_names
     
 
