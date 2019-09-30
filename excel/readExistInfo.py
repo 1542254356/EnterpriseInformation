@@ -57,8 +57,8 @@ def get_corp_addr_map_and_names(xls_path):
     xls = Excel2Dict(xls_path)
     corp_addr_map = {}
     corporation_names = []
-    for i in range(10):
-        d = xls.get_dict_by_row(random.randint(1, xls.row_num))
+    for i in range(1, xls.row_num):
+        d = xls.get_dict_by_row(i)
         cnames = d['cname'].split('; ')
         types = d['type'].split('; ')
         addrs = d['addr'].split('; ')
@@ -68,7 +68,7 @@ def get_corp_addr_map_and_names(xls_path):
                 continue
             corp_addr = addrs[i].split(' ')[-1]
             corp_addr_map[cnames[i]] = corp_addr
-            corporation_names.append(corp_addr)
+            corporation_names.append(cnames[i])
     return corp_addr_map, corporation_names
     
 
