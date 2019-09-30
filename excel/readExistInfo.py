@@ -6,7 +6,7 @@ import random
 
 
 class Excel2Dict:
-    def __init__(self, xls='sh.xls', sheet_index=0):
+    def __init__(self, xls='test/sh.xls', sheet_index=0):
         '''将excel转换成dict的类
         
         xls: 打开的excel文件名
@@ -14,7 +14,7 @@ class Excel2Dict:
         book = xlrd.open_workbook(xls)
         self.sheet = book.sheet_by_index(0)
         self.title = [_.value for _ in self.sheet.row(0)]
-        self.row_num = self.sheet.row_len(0)
+        self.row_num = self.sheet.nrows
         
     def get_dict_by_row(self, row):
         '''传入行号，返回字典'''
