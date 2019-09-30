@@ -52,25 +52,30 @@ class Dict2Excel:
         self.wb.save(xls_name)
 
 
-if __name__ == '__main__':
-    import os
-    from pprint import pprint
-    xls = Excel2Dict(os.path.join('..', 'test', 'sh.xls'))
-    # xls_out = Dict2Excel('test1')
+def get_corp_addr_map_and_names(xls_path):
+    '''获取公司名和地址的字典, 和公司名'''
+    xls = Excel2Dict(xls_path)
     corp_addr_map = {}
     corporation_names = []
-    for i in range(500):
-        d = xls.get_dict_by_row(random.randint(1, 8000))
+    for i in range(10):
+        d = xls.get_dict_by_row(random.randint(1, xls.row_num))
         cnames = d['cname'].split('; ')
         types = d['type'].split('; ')
         addrs = d['addr'].split('; ')
         for i, e in enumerate(types):
-            if e == '个人':
+            if e == '个人' or len(cnames[i]) < 4:
                 print('跳过个人', cnames[i])
                 continue
             corp_addr = addrs[i].split(' ')[-1]
             corp_addr_map[cnames[i]] = corp_addr
             corporation_names.append(corp_addr)
+    return corp_addr_map, corporation_names
+    
+
+if __name__ == '__main__':
+    import os
+    from pprint import pprint
+    corp_addr_map, corporation_names = get_corp_addr_map_and_names(os.path.join('..', 'test', 'sh.xls'))
     pprint(corp_addr_map)
     pprint(corporation_names)
     
