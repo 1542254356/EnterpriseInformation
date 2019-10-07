@@ -8,7 +8,7 @@ class Database:
                        password='enterprise123',
                        db_name='db_enterprise',
                        tb_name='t_company_addr'):
-        '''使用records库操作MySQL，还是面向对象的方式舒服一点'''
+        '''使用records库操作MySQL(面向对象的方式)'''
         n = 0
         while n < 3:
             n += 1
@@ -27,7 +27,11 @@ class Database:
     def write(self, id, corp_name, addr):
         '''写入数据库'''
         self.db.query(f'insert into {self.table_name} values({id},"{corp_name}", "{addr}")')
-        
+    
+    def write_many(self, data: [{}]):
+        '''一次写入大量数据, 传入字典列表'''
+        self.db.bulk_query(f'insert into {self.table_name} values(:id, :cname, :addr)', data)
+
     def query_as_dict(self, sql):
         '''将请求的结果按照字典返回'''
         rows = self.db.query(sql)
