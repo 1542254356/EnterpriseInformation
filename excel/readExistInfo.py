@@ -62,7 +62,7 @@ class Dict2Excel:
 
 
 def is_corp(name):
-    for t in ('厂', '馆', '社', '大学', '学院', '公司', '研究院'):
+    for t in ('厂', '馆', '社', '局', '大学', '学院', '公司', '研究院'):
         if t in name:
             return True
     return False
@@ -86,6 +86,8 @@ def get_corp_addr_map_and_names(xls_path):
                 # TODO: 类型长度与公司名长度不匹配导致IndexError
                 # 这里只用名字长度作为个人的区分, 避免使用下标, 可能还需要改进
                 if len(e) < 6 and not is_corp(e):
+                    # 记录排除名单到文件
+                    # print(e, file=f)
                     continue
                 # 去掉开头的邮编
                 corp_addr = re.sub('([0-9]{6}\\s?)?', '', addr)
