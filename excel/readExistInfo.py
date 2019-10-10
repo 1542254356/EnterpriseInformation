@@ -82,6 +82,7 @@ def get_corp_addr_map_and_names(xls_path):
             if len(types) > 1:
                 types = types[:-1]
             addr = d['addr']
+            recorded = False
             for i, e in enumerate(cnames):
                 # TODO: 类型长度与公司名长度不匹配导致IndexError
                 # 这里只用名字长度作为个人的区分, 避免使用下标, 可能还需要改进
@@ -91,7 +92,9 @@ def get_corp_addr_map_and_names(xls_path):
                     continue
                 # 去掉开头的邮编
                 corp_addr = re.sub('([0-9]{6}\\s?)?', '', addr)
-                corp_addr_map[e] = corp_addr
+                if not recorded:
+                    corp_addr_map[e] = corp_addr
+                    recorded = True
                 corporation_names.append(e)
     return corp_addr_map, corporation_names
     
