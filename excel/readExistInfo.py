@@ -28,11 +28,17 @@ class Excel2Dict:
     def get_dict_by_row(self, row):
         '''传入行号，返回字典'''
         r = self.sheet.row(row)
-        return {
-            'cname': r[self.cname_col].value,
-            'addr' : r[self.addr_col].value,
-            'type' : r[self.type_col].value
-        }
+        try:
+            rst_dict = {
+                'cname': r[self.cname_col].value,
+                'addr' : r[self.addr_col].value,
+                'type' : r[self.type_col].value
+            }
+        except KeyError:
+            print(f'{xls} 列属性不一致, 请检查!!!')
+            import sys
+            sys.exit(1)
+        return rst_dict
         
 
 class Dict2Excel:
