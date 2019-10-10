@@ -73,35 +73,39 @@ def is_corp(name):
             return True
     return False
 
-def get_corp_addr_map_and_names(xls_path):
+def get_corp_addr_map_and_names(xls_path, record=False):
     '''获取公司名和地址的字典, 和公司名'''
     xls = Excel2Dict(xls_path)
     corp_addr_map = {}
     corporation_names = []
     # 排除名单写入文件
-    with open(xls_path+'-exclude.txt', 'w') as f:
-        for k in range(1, xls.row_num):
-            d = xls.get_dict_by_row(k)
-            cnames = d['cname'].split('; ')
-            types = d['type'].split('  ')
-            # 去掉尾部空项
-            if len(types) > 1:
-                types = types[:-1]
-            addr = d['addr']
-            recorded = False
-            for i, e in enumerate(cnames):
-                # TODO: 类型长度与公司名长度不匹配导致IndexError
-                # 这里只用名字长度作为个人的区分, 避免使用下标, 可能还需要改进
-                if len(e) < 6 and not is_corp(e):
-                    # 记录排除名单到文件
-                    # print(e, file=f)
-                    continue
-                # 去掉开头的邮编
-                corp_addr = re.sub('([0-9]{6}\\s?)?', '', addr)
-                if not recorded:
-                    corp_addr_map[e] = corp_addr
-                    recorded = True
-                corporation_names.append(e)
+    if record:
+        fn = open(xls_path+'-exclude.txt', 'w')
+    for k in range(1, xls.row_num):
+        d = xls.get_dict_by_row(k)
+        cnames = d['cname'].split('; ')
+        types = d['type'].split('  ')
+        # 去掉尾部空项
+        if len(types) > 1:
+            types = types[:-1]
+        addr = d['addr']
+        recorded = False
+        for i, e in enumerate(cnames):
+            # TODO: 类型长度与公司名长度不匹配导致IndexError
+            # 这里只用名字长度作为个人的区分, 避免使用下标, 可能还需要改进
+            if len(e) < 6 and not is_corp(e):
+                # 记录排除名单到文件
+                if record:
+                    print(e, file=fn)
+                continue
+            # 去掉开头的邮编
+            corp_addr = re.sub('([0-9]{6}\\s?)?', '', addr)
+            if not recorded:
+                corp_addr_map[e] = corp_addr
+                recorded = True
+            corporation_names.append(e)
+    if record:
+        fn.close()
     return corp_addr_map, corporation_names
     
 
