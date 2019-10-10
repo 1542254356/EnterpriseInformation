@@ -1,12 +1,19 @@
-import pytest
 from excel.readExistInfo import get_corp_addr_map_and_names
-
-
 import os
 # from pprint import pprint
 
-def _test_single_file(fn, included_pairs, excluded, e2, limit=10):
-    corp_addr_map, corporation_names = get_corp_addr_map_and_names(fn)
+
+def _test_single_file(fn, included_pairs: [(str, str)], excluded, e2, limit=10):
+    """测试模板方法
+    
+    fn              : 输入文件的路径
+    included_pairs  : 键-值元组列表
+    excluded        : 不应该出现在字典和列表的元素
+    e2              : 应该出现在列表但不应该出现在字典里的
+    limit           : 要求地址的前*limit*个字符一致, 默认为10
+    """
+    corp_addr_map, corporation_names = get_corp_addr_map_and_names(fn, True)
+    assert len(corp_addr_map) < len(corporation_names)
     for i, (k, v) in enumerate(included_pairs):
         assert corp_addr_map[k][:limit] == v[:limit], f'line {i+1} error'
     for k in excluded:
