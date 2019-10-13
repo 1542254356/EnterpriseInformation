@@ -3,6 +3,7 @@ import jieba
 from fuzzywuzzy.fuzz import token_sort_ratio
 import re
 
+
 def _case_filter(_set):
     rst = []
     for case in _set:
@@ -13,7 +14,7 @@ def _case_filter(_set):
     return rst
     
 
-def fuzzy_match(corp1, corp2, thres=.5):
+def fuzzy_match(corp1, corp2, thres=50):
     df = cpca.transform([corp1, corp2])
     df = df['地址'].tolist()
     rst = [' '.join(jieba.cut(i)) for i in df]
@@ -53,5 +54,6 @@ if __name__ == '__main__':
         try:
             assert not fuzzy_match(*case), '被判为相似'
             print('判定为不相似:', *case)
-        except AssertionError:
+        except AssertionError as e:
+            print('不应该相似', e)
             continue 
