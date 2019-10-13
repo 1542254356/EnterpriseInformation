@@ -3,13 +3,22 @@ import jieba
 from fuzzywuzzy.fuzz import token_sort_ratio
 import re
 
+def _case_filter(_set):
+    rst = []
+    for case in _set:
+        c = case
+        for k in _filter:
+            c = re.sub(k, ' ', c)
+        rst.append(c)
+    return rst
+    
 
 def fuzzy_match(corp1, corp2, thres=.5):
     df = cpca.transform([corp1, corp2])
     df = df['地址'].tolist()
     rst = [' '.join(jieba.cut(i)) for i in df]
-    rate = token_sort_ratio(*rst)
-    print(rst, rate)
+    rate = token_sort_ratio(*_case_filter(rst))
+    print(rate, '%', end=' ')
     if rate > thres:
         return True
     
@@ -32,20 +41,9 @@ if __name__ == '__main__':
     _filter = (
         '有限', '责任', '公司', '株式会社', '\(.+?\)'
     )
-    def case_filter(_set):
-        rst = []
-        for case in _set:
-            c = case
-            for k in _filter:
-                c = re.sub(k, ' ', c)
-            rst.append(c)
-        return rst
-
-
+    
     for case in test_set:
         try:
-            print(*case)
-            case = case_filter(case)
             assert fuzzy_match(*case), '被判为不相似'
             print('判定为相似:', *case)
         except AssertionError:
@@ -53,8 +51,6 @@ if __name__ == '__main__':
 
     for case in test_n_set:
         try:
-            print(*case)
-            case = case_filter(case)
             assert not fuzzy_match(*case), '被判为相似'
             print('判定为不相似:', *case)
         except AssertionError:
