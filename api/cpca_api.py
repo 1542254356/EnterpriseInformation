@@ -8,8 +8,7 @@ def corps_to_addr(corps: [str]) -> [(str, str)]:
     >>> corps_to_addr(location_str)
     [('浙江省', '杭州市'), ('浙江省', '温州市')]
     '''
-    df = cpca.transform(corps)
-    print(df)
+    df = cpca.transform(corps, umap={})
     prov = df['省'].tolist()
     city = df['市'].tolist()
     return [(e, city[i]) for i, e in enumerate(prov)]
