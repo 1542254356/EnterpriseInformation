@@ -122,8 +122,17 @@ def write_app_addrs(xls):
     from dao.CompanyAddr import CompanyAddr
 
     corp = CompanyAddr()
+
+    # 新文件名
+    fn = xls.split('.')
+    fn[-2] += '_'
+    fn = '.'.join(fn)
     # 打开工作簿获取第一张表
-    wb = xlrd.open_workbook(xls)
+    if os._exists(fn):
+        wb = xlrd.open_workbook(fn)
+    else:
+        wb = xlrd.open_workbook(xls)
+
     origin_sht = wb.sheet_by_index(0)
     wb = copy(wb)
     sheet = wb.get_sheet(0)
@@ -133,21 +142,25 @@ def write_app_addrs(xls):
     if origin_sht.row(0)[-1] != '申请人的地址':
         # 写入标头
         sheet.write(0, col_len, '申请人的地址')
-    print(f'正在写入到 _{xls}!')
-    # 新文件名
-    fn = xls.split('.')
-    fn[-2] += '_'
-    fn = '.'.join(fn)
-    for i in range(1, row_len):
-        corp_names = origin_sht.row(i)[8].value.split('; ')
-        addr = [corp.getAddr(name) for name in corp_names]
-        addr = ','.join(addr)
-        print(f'{i}/{row_len}', end='\r')
-        sheet.write(i, col_len, addr)
-        # 写300条保存一下
-        if i % 300 == 0:
-            wb.save(fn)
-    wb.save(fn)
+    
+    print(f'正在写入到 {fn}!')
+    try:
+        for i in range(1, row_len):
+            if origin_sht.row(i)[col_len-1].value:
+                # print('跳过已写', origin_sht.row(i)[col_len-1])
+                continue
+            corp_names = origin_sht.row(i)[8].value.split('; ')
+            addr = [corp.getAddr(name) for name in corp_names]
+            addr = ','.join(addr)
+            print(f'{i}/{row_len}', end='\r')
+            sheet.write(i, col_len, addr)
+            # 写300条保存一下
+            if i % 300 == 0:
+                wb.save(fn)
+    except KeyboardInterrupt:
+        print('被终止!')
+    finally:
+        wb.save(fn)
 
 
 if __name__ == '__main__':
