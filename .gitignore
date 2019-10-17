@@ -3,3 +3,5 @@ venv
 .idea
 2009-2015联合申请专利
 *.xls
+progress.txt
+corporation_names.txt

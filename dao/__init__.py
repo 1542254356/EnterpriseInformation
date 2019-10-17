@@ -1,3 +1,5 @@
 from dao.CompanyAddr import CompanyAddr
 
-__all__ = ['CompanyAddr']
+companyAddr = CompanyAddr()
+
+__all__ = ['companyAddr']
