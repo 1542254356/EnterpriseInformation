@@ -43,12 +43,12 @@ class CompanyAddr(MySQLBase):
             results = self.cursor.fetchall()
 
             if len(results) == 0:
-                return None
+                return ''
 
             return results[0][0]
         except Exception as e:
             print(e)
-            return None
+            return ''
 
     def add(self,company, addr):
         return self.saveDic({company: addr})
