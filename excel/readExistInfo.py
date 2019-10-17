@@ -4,6 +4,7 @@ import xlrd
 import xlwt
 import random
 import re
+from xlutils.copy import copy
 
 
 class Excel2Dict:
@@ -13,6 +14,7 @@ class Excel2Dict:
         xls: 打开的excel文件名
         sheet_index: 第几张表'''
         book = xlrd.open_workbook(xls)
+        self.fn = xls
         self.sheet = book.sheet_by_index(0)
         self.title = [_.value for _ in self.sheet.row(0)]
         self.row_num = self.sheet.nrows
@@ -24,7 +26,7 @@ class Excel2Dict:
                 self.addr_col = i
             elif e == '申请人类型':
                 self.type_col = i
-        
+
     def get_dict_by_row(self, row):
         '''传入行号，返回字典'''
         r = self.sheet.row(row)
@@ -35,7 +37,7 @@ class Excel2Dict:
                 'type' : r[self.type_col].value
             }
         except KeyError:
-            print(f'{xls} 列属性不一致, 请检查!!!')
+            print(f'{self.xls} 列属性不一致, 请检查!!!')
             import sys
             sys.exit(1)
         return rst_dict
@@ -109,11 +111,51 @@ def get_corp_addr_map_and_names(xls_path, record=False):
     return corp_addr_map, corporation_names
     
 
-if __name__ == '__main__':
+def write_app_addrs(xls):
+    '''
+    传入xls文件路径, 在同目录下生成_后缀的xls文件
+    如上海.xls -> 上海_.xls
+    '''
     import os
-    from pprint import pprint
-    corp_addr_map, corporation_names = get_corp_addr_map_and_names(os.path.join('..', 'test', 'sh.xls'))
-    # for k, v in corp_addr_map.items():
-    pprint(corp_addr_map)
-    pprint(corporation_names)
+    import sys
+    sys.path.append(os.path.abspath('..'))
+    from dao.CompanyAddr import CompanyAddr
+
+    corp = CompanyAddr()
+    # 打开工作簿获取第一张表
+    wb = xlrd.open_workbook(xls)
+    origin_sht = wb.sheet_by_index(0)
+    wb = copy(wb)
+    sheet = wb.get_sheet(0)
+    # 检查列数
+    col_len = len(origin_sht.row(0))
+    row_len = origin_sht.nrows
+    if origin_sht.row(0)[-1] != '申请人的地址':
+        # 写入标头
+        sheet.write(0, col_len, '申请人的地址')
+    print(f'正在写入到 _{xls}!')
+    # 新文件名
+    fn = xls.split('.')
+    fn[-2] += '_'
+    fn = '.'.join(fn)
+    for i in range(1, row_len):
+        corp_names = origin_sht.row(i)[8].value.split('; ')
+        addr = [corp.getAddr(name) for name in corp_names]
+        addr = ','.join(addr)
+        print(f'{i}/{row_len}', end='\r')
+        sheet.write(i, col_len, addr)
+        # 写300条保存一下
+        if i % 300 == 0:
+            wb.save(fn)
+    wb.save(fn)
+
+
+if __name__ == '__main__':
+    # import os
+    # from pprint import pprint
+    # corp_addr_map, corporation_names = get_corp_addr_map_and_names(os.path.join('..', 'test', 'sh.xls'))
+    # # for k, v in corp_addr_map.items():
+    # pprint(corp_addr_map)
+    # pprint(corporation_names)
+    write_app_addrs('demo.xls')
     
