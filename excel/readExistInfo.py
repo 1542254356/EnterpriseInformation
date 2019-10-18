@@ -111,10 +111,10 @@ def get_corp_addr_map_and_names(xls_path, record=False):
     return corp_addr_map, corporation_names
     
 
-def write_app_addrs(xls):
+def write_app_addrs(xls, output_xls=''):
     '''
-    传入xls文件路径, 在同目录下生成_后缀的xls文件
-    如上海.xls -> 上海_.xls
+    传入xls文件路径, 在同目录下生成_前缀的xls文件
+    如上海.xls -> _上海.xls
     '''
     import os
     import sys
@@ -123,12 +123,16 @@ def write_app_addrs(xls):
 
     corp = CompanyAddr()
 
-    # 新文件名
-    fn = xls.split('.')
-    fn[-2] += '_'
-    fn = '.'.join(fn)
+    if output_xls:
+        fn = output_xls
+    else:
+        # 新文件名
+        fn = xls.split('.')
+        fn[-2] = '_' + fn[-2]
+        fn = '.'.join(fn)
     # 打开工作簿获取第一张表
-    if os._exists(fn):
+    if os.path.exists(fn):
+        print(f'{fn}存在, 尝试从上次的进度继续...')
         wb = xlrd.open_workbook(fn)
     else:
         wb = xlrd.open_workbook(xls)
@@ -139,28 +143,38 @@ def write_app_addrs(xls):
     # 检查列数
     col_len = len(origin_sht.row(0))
     row_len = origin_sht.nrows
-    if origin_sht.row(0)[-1] != '申请人的地址':
+    if origin_sht.row(0)[-1].value != '申请人的地址':
         # 写入标头
         sheet.write(0, col_len, '申请人的地址')
+    else:
+        col_len -= 1
     
     print(f'正在写入到 {fn}!')
     try:
         for i in range(1, row_len):
-            if origin_sht.row(i)[col_len-1].value:
-                # print('跳过已写', origin_sht.row(i)[col_len-1])
+            try:
+                r = origin_sht.row(i)
+                v = r[col_len].value
+                # 如果未写过, 则为空或抛出IndexError
+                if not v:
+                    raise IndexError
+                # 跳过已写的部分
                 continue
-            corp_names = origin_sht.row(i)[8].value.split('; ')
-            addr = [corp.getAddr(name) for name in corp_names]
-            addr = ','.join(addr)
-            print(f'{i}/{row_len}', end='\r')
-            sheet.write(i, col_len, addr)
-            # 写300条保存一下
-            if i % 300 == 0:
-                wb.save(fn)
+            except IndexError:
+                # 抛出IndexError则需要写入数据
+                corp_names = origin_sht.row(i)[8].value.split('; ')
+                addr = [corp.getAddr(name) for name in corp_names]
+                addr = ','.join(addr)
+                print(f'{i}/{row_len}', end='\r')
+                sheet.write(i, col_len, addr)
+                # 写300条保存一下
+                if i % 300 == 0:
+                    wb.save(fn)
     except KeyboardInterrupt:
         print('被终止!')
     finally:
         wb.save(fn)
+        print(f'写入完成: [{fn}]')
 
 
 if __name__ == '__main__':
