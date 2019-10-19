@@ -12,4 +12,15 @@ def corps_to_addr(corps: [str]) -> [(str, str)]:
     prov = df['省'].tolist()
     city = df['市'].tolist()
     return [(e, city[i]) for i, e in enumerate(prov)]
-    
+
+
+def addr_split_with_area(corps: [str]) -> [(str, str, str)]:
+    '''传入公司名列表, 返回元组列表, 元组包含省市区信息
+    '''
+    df = cpca.transform(corps, umap={})
+    prov = df['省'].tolist()
+    city = df['市'].tolist()
+    area = df['区'].tolist()
+    return [(e, city[i], area[i]) for i, e in enumerate(prov)]
+
+
