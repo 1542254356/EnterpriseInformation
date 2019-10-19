@@ -17,10 +17,13 @@ def corps_to_addr(corps: [str]) -> [(str, str)]:
 def addr_split_with_area(corps: [str]) -> [(str, str, str)]:
     '''传入公司名列表, 返回元组列表, 元组包含省市区信息
     '''
-    df = cpca.transform(corps, umap={})
+    df = cpca.transform(corps, umap={}, cut=False, lookahead=4)
     prov = df['省'].tolist()
     city = df['市'].tolist()
     area = df['区'].tolist()
     return [(e, city[i], area[i]) for i, e in enumerate(prov)]
 
 
+if __name__ == '__main__':
+    print(addr_split_with_area(['上海市浦东新区']))
+    
