@@ -120,6 +120,7 @@ def write_app_addrs(xls, output_xls=''):
     import sys
     sys.path.append(os.path.abspath('..'))
     from dao.CompanyAddr import CompanyAddr
+    from api.cpca_api import addr_split_with_area
 
     corp = CompanyAddr()
 
@@ -127,9 +128,9 @@ def write_app_addrs(xls, output_xls=''):
         fn = output_xls
     else:
         # 新文件名
-        fn = xls.split('.')
-        fn[-2] = '_' + fn[-2]
-        fn = '.'.join(fn)
+        fn = list(os.path.split(xls))
+        fn[-1] = '_' + fn[-1]
+        fn = os.path.join(*fn)
     # 打开工作簿获取第一张表
     if os.path.exists(fn):
         print(f'{fn}存在, 尝试从上次的进度继续...')
@@ -164,9 +165,20 @@ def write_app_addrs(xls, output_xls=''):
                 # 抛出IndexError则需要写入数据
                 corp_names = origin_sht.row(i)[8].value.split('; ')
                 addr = [corp.getAddr(name) for name in corp_names]
+                # 语义分割地址
+                addr_split = addr_split_with_area(addr)
+                prov, city, area = zip(*addr_split)
                 addr = ','.join(addr)
+                prov = ','.join(prov)
+                city = ','.join(city)
+                area = ','.join(area)
                 print(f'{i}/{row_len}', end='\r')
+                # 写入地址
                 sheet.write(i, col_len, addr)
+                # 写入分散的地址(省市区)
+                sheet.write(i, col_len+1, prov)
+                sheet.write(i, col_len+2, city)
+                sheet.write(i, col_len+3, area)
                 # 写300条保存一下
                 if i % 300 == 0:
                     wb.save(fn)
@@ -184,5 +196,5 @@ if __name__ == '__main__':
     # # for k, v in corp_addr_map.items():
     # pprint(corp_addr_map)
     # pprint(corporation_names)
-    write_app_addrs('demo.xls')
+    write_app_addrs('../2009-2015联合申请专利/2009年长三角城市群联合申请专利/安徽.xls')
     
