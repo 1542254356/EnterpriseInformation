@@ -116,6 +116,12 @@ def write_app_addrs(xls, output_xls=''):
     传入xls文件路径, 在同目录下生成_前缀的xls文件
     如上海.xls -> _上海.xls
     '''
+    city_map = {
+        "国家电网有限公司":"北京市",
+        "京东方科技集团股份有限公司": "北京市"
+    }
+
+
     import os
     import sys
     sys.path.append(os.path.abspath('..'))
@@ -168,11 +174,20 @@ def write_app_addrs(xls, output_xls=''):
                 # 语义分割地址
                 addr_split = addr_split_with_area(addr)
                 prov, city, area = zip(*addr_split)
+                city = list(city)
+                for i in range(len(corp_names)):
+                    if corp_names[i] in city_map:
+                        city[i] = city_map[corp_names[i]]
+
                 addr = ','.join(addr)
                 prov = ','.join(prov)
+
                 city = ','.join(city)
                 area = ','.join(area)
                 print(f'{i}/{row_len}', end='\r')
+
+
+
                 # 写入地址
                 sheet.write(i, col_len, addr)
                 # 写入分散的地址(省市区)
@@ -184,6 +199,8 @@ def write_app_addrs(xls, output_xls=''):
                     wb.save(fn)
     except KeyboardInterrupt:
         print('被终止!')
+    except Exception as e:
+        print(e)
     finally:
         wb.save(fn)
         print(f'写入完成: [{fn}]')

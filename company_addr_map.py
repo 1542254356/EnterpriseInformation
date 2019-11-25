@@ -26,7 +26,7 @@ def get_file_map():
 def get_addr_by_net(corporation):
     # 从数据库读取
     addr = companyAddr.getAddr(corporation)
-    if addr is not None:
+    if addr is not None and len(addr) > 1:
         return addr
 
     # 使用腾讯地图搜索
@@ -69,6 +69,7 @@ if __name__ == '__main__':
                 if addr == None:
                     fail += 1
                 print(count, fail)
+                print(corporation, addr)
                 if addr is not None:
                     companyAddr.add(corporation, addr)
 

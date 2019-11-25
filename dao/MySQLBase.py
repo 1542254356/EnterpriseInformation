@@ -3,7 +3,7 @@ import pymysql
 
 class MySQLBase:
     def __init__(self):
-        self.host = 'hjwblog.com'
+        self.host = 'i.hjwblog.com'
         self.user = 'enterprise'
         self.passwd = 'enterprise123'
         self.dbName = 'db_enterprise'
