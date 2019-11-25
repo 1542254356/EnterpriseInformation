@@ -170,7 +170,7 @@ def write_app_addrs(xls, output_xls=''):
             except IndexError:
                 # 抛出IndexError则需要写入数据
                 corp_names = origin_sht.row(i)[8].value.split('; ')
-                addr = [corp.getAddr(name) for name in corp_names]
+                addr = [corp.getAddr(name) if is_corp(name) else '' for name in corp_names]
                 # 语义分割地址
                 addr_split = addr_split_with_area(addr)
                 prov, city, area = zip(*addr_split)

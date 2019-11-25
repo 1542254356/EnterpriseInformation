@@ -17,7 +17,8 @@ def corps_to_addr(corps: [str]) -> [(str, str)]:
 def addr_split_with_area(corps: [str]) -> [(str, str, str)]:
     '''传入公司名列表, 返回元组列表, 元组包含省市区信息
     '''
-    df = cpca.transform(corps, umap={'浦东新区':'上海市'},cut=False)
+
+    df = cpca.transform(corps, umap={'浦东新区':'上海市'}, cut=False, lookahead=4)
     prov = df['省'].tolist()
     city = df['市'].tolist()
     area = df['区'].tolist()
