@@ -118,7 +118,9 @@ def write_app_addrs(xls, output_xls=''):
     '''
     city_map = {
         "国家电网有限公司":"北京市",
-        "京东方科技集团股份有限公司": "北京市"
+        "京东方科技集团股份有限公司": "北京市",
+        "国家电网公司": "北京市",
+
     }
 
 
@@ -175,10 +177,10 @@ def write_app_addrs(xls, output_xls=''):
                 addr_split = addr_split_with_area(addr)
                 prov, city, area = zip(*addr_split)
                 city = list(city)
-                for i in range(len(corp_names)):
-                    if corp_names[i] in city_map:
-                        city[i] = city_map[corp_names[i]]
-
+                for j in range(len(corp_names)):
+                    if corp_names[j] in city_map:
+                        city[j] = city_map[corp_names[j]]
+                city = tuple(city)
                 addr = ','.join(addr)
                 prov = ','.join(prov)
 
@@ -186,10 +188,11 @@ def write_app_addrs(xls, output_xls=''):
                 area = ','.join(area)
                 print(f'{i}/{row_len}', end='\r')
 
-
+                # print(addr,'|', prov,'|', city,'|', area)
 
                 # 写入地址
                 sheet.write(i, col_len, addr)
+
                 # 写入分散的地址(省市区)
                 sheet.write(i, col_len+1, prov)
                 sheet.write(i, col_len+2, city)
